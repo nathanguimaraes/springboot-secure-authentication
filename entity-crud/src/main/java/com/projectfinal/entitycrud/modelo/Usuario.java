@@ -1,32 +1,26 @@
 package com.projectfinal.entitycrud.modelo;
 
-
-
-
-
 import java.util.Date;
+import java.util.List;
 
 import jakarta.persistence.Basic;
-
 import jakarta.persistence.Entity;
-
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
-
 import jakarta.persistence.GenerationType;
-
 import jakarta.persistence.Id;
-
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Temporal;
-
 import jakarta.persistence.TemporalType;
+import jakarta.persistence.JoinColumn;
 
 import jakarta.validation.constraints.Email;
-
 import jakarta.validation.constraints.NotEmpty;
-
 import jakarta.validation.constraints.NotNull;
-
 import jakarta.validation.constraints.Size;
+
+
 
 import org.hibernate.validator.constraints.br.CPF;
 
@@ -91,8 +85,28 @@ public class Usuario {
 	
 
 	private boolean ativo;	
+	
+	
+	@ManyToMany(fetch = FetchType.EAGER)
+	@JoinTable(name="usuario_papel",
+			   joinColumns = @JoinColumn(name = "usuario_id"),
+			   inverseJoinColumns = @JoinColumn(name = "papel_id"))
+	
+	private List<Papel> papeis;
 
 	
+	
+	
+
+	
+
+	public List<Papel> getPapeis() {
+		return papeis;
+	}
+
+	public void setPapeis(List<Papel> papeis) {
+		this.papeis = papeis;
+	}
 
 	public Long getId() {
 

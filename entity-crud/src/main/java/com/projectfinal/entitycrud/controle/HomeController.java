@@ -11,7 +11,7 @@ public class HomeController {
 	
 	@RequestMapping("/") 
 	public String index(Model model) {
-		model.addAttribute("msnBemVindo", "Bem-vindo à biblioteca");
+		model.addAttribute("msnBemVindo", "Exemplo básico ");			//essa msg é atribuida na index.html como msnBemVindo
 		return "publica-index";
 	}
 
