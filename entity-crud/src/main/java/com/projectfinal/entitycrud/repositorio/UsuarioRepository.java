@@ -7,6 +7,7 @@ import com.projectfinal.entitycrud.modelo.Usuario;
 
 public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
 
+	Usuario findByLogin(String login);
 }
 
 

@@ -1,9 +1,15 @@
 package com.projectfinal.entitycrud.controle;
 
 
+
+
 import jakarta.validation.Valid;
 
+
 import java.util.Optional;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,8 +23,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 
+
 import com.projectfinal.entitycrud.modelo.Usuario;
 import com.projectfinal.entitycrud.repositorio.UsuarioRepository;
+
+import com.projectfinal.entitycrud.modelo.Papel;
+import com.projectfinal.entitycrud.repositorio.PapelRepository;
+
+
+
 
 @Controller
 @RequestMapping("/usuario")
@@ -27,6 +40,9 @@ public class UsuarioController {
 	@Autowired
 	private UsuarioRepository usuarioRepository;
 	
+	@Autowired
+	private PapelRepository papelRepository;
+		
 	@GetMapping("/novo")
 	public String adicionarUsuario(Model model) {
 		model.addAttribute("usuario", new Usuario());
@@ -35,10 +51,23 @@ public class UsuarioController {
 	
 	@PostMapping("/salvar")
 	public String salvarUsuario(@Valid Usuario usuario, BindingResult result, 
-				RedirectAttributes attributes) {
+				Model model, RedirectAttributes attributes) {
 		if (result.hasErrors()) {
 			return "/publica-criar-usuario";
-		}	
+		}
+		
+		Usuario usr = usuarioRepository.findByLogin(usuario.getLogin());
+		if (usr != null) {
+			model.addAttribute("loginExiste", "Login já existe cadastrado");
+			return "/publica-criar-usuario";
+		}
+		
+		//Busca o papel básico de usuário
+		Papel papel = papelRepository.findByPapel("USER");
+		List<Papel> papeis = new ArrayList<Papel>();
+		papeis.add(papel);				
+		usuario.setPapeis(papeis); // associa o papel de USER ao usuário
+		
 		usuarioRepository.save(usuario);
 		attributes.addFlashAttribute("mensagem", "Usuário salvo com sucesso!");
 		return "redirect:/usuario/novo";
@@ -80,5 +109,19 @@ public class UsuarioController {
 	    return "redirect:/usuario/admin/listar";
 	}
 		
+	@GetMapping("/editarPapel/{id}")
+	public String selecionarPapel(@PathVariable("id") long id, Model model) {
+		Optional<Usuario> usuarioVelho = usuarioRepository.findById(id);
+		if (!usuarioVelho.isPresent()) {
+            throw new IllegalArgumentException("Usuário inválido:" + id);
+        } 
+		Usuario usuario = usuarioVelho.get();
+	    model.addAttribute("usuario", usuario);
+	    
+	    model.addAttribute("listaPapeis", papelRepository.findAll());
+	    
+	    return "/auth/admin/admin-editar-papel-usuario";
+	}
 }
+
 
