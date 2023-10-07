@@ -98,15 +98,7 @@ public class Usuario {
 	
 	
 
-	
 
-	public List<Papel> getPapeis() {
-		return papeis;
-	}
-
-	public void setPapeis(List<Papel> papeis) {
-		this.papeis = papeis;
-	}
 
 	public Long getId() {
 
@@ -203,6 +195,14 @@ public class Usuario {
 		this.ativo = ativo;
 
 	}
+	
+	public List<Papel> getPapeis() {						//listando papeis 
+		return papeis;
+	}
+	public void setPapeis(List<Papel> papeis) {				//definindo papeis 
+		this.papeis = papeis;
+	}
+
 
 	
 
