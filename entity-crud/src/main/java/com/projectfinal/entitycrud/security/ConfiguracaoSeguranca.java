@@ -2,6 +2,7 @@ package com.projectfinal.entitycrud.security;
 
 
 
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -12,6 +13,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+
 
 import com.projectfinal.entitycrud.repositorio.UsuarioRepository;
 
@@ -39,23 +41,25 @@ public class ConfiguracaoSeguranca extends WebSecurityConfigurerAdapter {
 		DetalheUsuarioServico detalheDoUsuario = new DetalheUsuarioServico(usuarioRepository);
 		return detalheDoUsuario;
 	}
-	
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
-        http.authorizeHttpRequests()																					//lambda
-                .antMatchers("/").permitAll()
-                .antMatchers("/auth/user/*").hasAnyAuthority("USER", "ADMIN", "BIBLIOTECARIO")
-                .antMatchers("/auth/admin/*").hasAnyAuthority("ADMIN")
-                .antMatchers("/auth/biblio/*").hasAnyAuthority("BIBLIOTECARIO")
-                .antMatchers("/usuario/admin/*").hasAnyAuthority("ADMIN")
-                .and()
-                .exceptionHandling(handling -> handling.accessDeniedPage("/auth/auth-acesso-negado"))
-                .formLogin(login -> login.successHandler(loginSucesso)
-                        .loginPage("/login").permitAll())
-                .logout(logout -> logout.logoutRequestMatcher(new AntPathRequestMatcher("/logout"))					//exibindo tela inicial apos sair
-                        .logoutSuccessUrl("/").permitAll());
+		http.authorizeRequests()														//alterar para lambda
+		.antMatchers("/").permitAll()
+		.antMatchers("/auth/user/*").hasAnyAuthority("USER","ADMIN","RELATOR")
+		.antMatchers("/auth/admin/*").hasAnyAuthority("ADMIN")
+		.antMatchers("/auth/relator/*").hasAnyAuthority("RELATOR")
+		.antMatchers("/usuario/admin/*").hasAnyAuthority("ADMIN")
+		.and()
+		.exceptionHandling().accessDeniedPage("/auth/auth-acesso-negado")
+		.and()
+		.formLogin().successHandler(loginSucesso)
+		.loginPage("/login").permitAll()
+		.and()
+		.logout().logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
+		.logoutSuccessUrl("/").permitAll();
 	}
 	
+
 	@Override
 	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
 		// O objeto que vai obter os detalhes do usuário

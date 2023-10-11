@@ -13,6 +13,8 @@ import java.util.List;
 
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.annotation.CurrentSecurityContext;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -41,6 +43,38 @@ public class UsuarioController {
 	
 	@Autowired
 	private PapelRepository papelRepository;
+	
+	@Autowired
+	private BCryptPasswordEncoder criptografia;
+	
+	/**
+	 * Método que verifica qual papel o usuário tem na aplicação 
+	 * */
+	private boolean temAutorizacao(Usuario usuario, String papel) {
+		for (Papel pp : usuario.getPapeis()) {
+			if (pp.getPapel().equals(papel)) {
+				return true;
+			}
+	    }
+		return false;
+	}
+	
+	@GetMapping("/index")
+	public String index(@CurrentSecurityContext(expression="authentication.name")
+						String login) {
+		
+		Usuario usuario = usuarioRepository.findByLogin(login);
+		
+		String redirectURL = "";
+		if (temAutorizacao(usuario, "ADMIN")) {
+            redirectURL = "/auth/admin/admin-index";
+        } else if (temAutorizacao(usuario, "USER")) {
+            redirectURL = "/auth/user/user-index";
+        } else if (temAutorizacao(usuario, "RELATOR")) {
+            redirectURL = "/auth/relator/relator-index";
+        }		
+        return redirectURL;
+	}
 		
 	@GetMapping("/novo")
 	public String adicionarUsuario(Model model) {
@@ -66,6 +100,9 @@ public class UsuarioController {
 		List<Papel> papeis = new ArrayList<Papel>();
 		papeis.add(papel);				
 		usuario.setPapeis(papeis); // associa o papel de USER ao usuário
+		
+		String senhaCriptografia = criptografia.encode(usuario.getPassword());
+		usuario.setPassword(senhaCriptografia);
 		
 		usuarioRepository.save(usuario);
 		attributes.addFlashAttribute("mensagem", "Usuário salvo com sucesso!");
@@ -146,10 +183,12 @@ public class UsuarioController {
 			if (usuarioOptional.isPresent()) {
 				Usuario usr = usuarioOptional.get();
 				usr.setPapeis(papeis); // relaciona papéis ao usuário
+				usr.setAtivo(usuario.isAtivo());
 				usuarioRepository.save(usr);
 	        }			
 		}		
 	    return "redirect:/usuario/admin/listar";
 	}
 }
+
 
