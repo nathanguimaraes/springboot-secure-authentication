@@ -45,10 +45,10 @@ public class ConfiguracaoSeguranca extends WebSecurityConfigurerAdapter {
 	protected void configure(HttpSecurity http) throws Exception {
 		http.authorizeRequests()														//alterar para lambda
 		.antMatchers("/").permitAll()
-		.antMatchers("/auth/user/*").hasAnyAuthority("USER","ADMIN","RELATOR")
-		.antMatchers("/auth/admin/*").hasAnyAuthority("ADMIN")
-		.antMatchers("/auth/relator/*").hasAnyAuthority("RELATOR")
-		.antMatchers("/usuario/admin/*").hasAnyAuthority("ADMIN")
+		.antMatchers("auth/user/*").hasAnyAuthority("USER","ADMIN","RELATOR")
+		.antMatchers("auth/admin/*").hasAnyAuthority("ADMIN")
+		.antMatchers("auth/relator/*").hasAnyAuthority("RELATOR")
+		.antMatchers("usuario/admin/*").hasAnyAuthority("ADMIN")
 		.and()
 		.exceptionHandling().accessDeniedPage("/auth/auth-acesso-negado")
 		.and()
